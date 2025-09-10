@@ -4,13 +4,13 @@ service: auth-server
 
 provider:
   name: aws
-  runtime: nodejs19.x
+  runtime: nodejs18.x
   region: us-east-1
   timeout: 30
   environment:
-    CLIENT_ID: ${self:custom.config.CLIENT_ID}
-    CLIENT_SECRET: ${self:custom.config.CLIENT_SECRET}
-    CALENDAR_ID: ${self:custom.config.CALENDAR_ID}
+    CLIENT_ID: ${file(config.json):CLIENT_ID}
+    CLIENT_SECRET: ${file(config.json):CLIENT_SECRET}
+    CALENDAR_ID: ${file(config.json):CALENDAR_ID}
  
 functions:
   getAuthURL:
@@ -29,5 +29,5 @@ functions:
     handler: handler.getCalendarEvents
     events:
       - http:
-        path: api/get-events/{access_token}
-        method: get
+          path: api/get-events/{access_token}
+          method: get
