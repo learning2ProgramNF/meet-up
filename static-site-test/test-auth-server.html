@@ -44,6 +44,7 @@
          <p id="events"></p>
     </main>
 
+    <script src="../auth-server/handler.js"></script>
     <script type="text/javascript">
         const getAuthUrlButton = document.getElementById('getAuthUrlButton');
         const resultElement = document.getElementById('result');
@@ -68,7 +69,8 @@
                 resultElement.innerText = 'Error: ' + error.message;
             });  
         });
-
+        
+        console.log("Script loaded -- Hello World!");
 
         // ---------------------- STEP 2 ----------------------
         const codeValue = document.getElementById('code');
@@ -80,7 +82,7 @@
             let code = codeValue.value;
 
             //if the authorization code is not URL-encoded, encode it
-            if(decodeURLCompnent(code) === code) {
+            if(decodeURICompnent(code) === code) {
                 code = encodeURIComponent(codeValue.value);
             }
             const getTokenRequest = getToken + "/" + code;
