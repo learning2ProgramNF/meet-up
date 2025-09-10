@@ -1,0 +1,8 @@
+# package directories
+node_modules
+jpsm_packages
+
+# serverless directories
+.serverless
+
+config.json
