@@ -3,7 +3,7 @@
   <head>
       <meta charset="utf-8" />
       <meta http-equiv="x-ua-compatible" content="ie=edge" />
-      <meta name="viewport" content="width=device-width, intial-scale=1"/>
+      <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
         
       <title>Test Auth Server</title>
@@ -28,7 +28,7 @@
         <a id="authURL" href target="_blank">Click to Authorize</a>
         <h4>Step 2: Get your code and exchange for access token</h4>
         <p>
-            After you're redirected back to your Meeet app on Github, copy hte code from the URI.
+            After you're redirected back to your Meet app on Github, copy the code from the URI.
         </p>
         <br />
         <label
@@ -44,7 +44,7 @@
          <p id="events"></p>
     </main>
 
-    <script src="../auth-server/handler.js"></script>
+    <script src="auth-server/handler.js"></script>
     <script type="text/javascript">
         const getAuthUrlButton = document.getElementById('getAuthUrlButton');
         const resultElement = document.getElementById('result');
@@ -78,11 +78,11 @@
         const accessTokenElement = document.getElementById('accessToken');
         const getToken = "https://vti60t46fd.execute-api.eu-central-1.amazonaws.com/dev/api/token/";
 
-        getAccessToken.onClick = function () {
+        getAccessToken.addEventListener('click', function () {
             let code = codeValue.value;
 
             //if the authorization code is not URL-encoded, encode it
-            if(decodeURICompnent(code) === code) {
+            if(decodeURIComponent(code) === code) {
                 code = encodeURIComponent(codeValue.value);
             }
             const getTokenRequest = getToken + "/" + code;
@@ -93,7 +93,7 @@
             .then(function (json) {
                 accessTokenElement.innerText = JSON.stringify(json);
             });
-        };
+        });
         // END STEP 2
 
         // -- Step 3 --
@@ -101,7 +101,7 @@
         const events = document.getElementById('events');
         const getCalendarEvents = "https://yttehensc7.execute-api.us-east-1.amazonaws.com/dev/api/get-events/{access_token}";
 
-        getEvents.onClick = function (){
+        getEvents.addEventListener('click', function () {
             const { access_token } = JSON.parse(accessTokenElement.innerText);
             const eventRequest = getCalendarEvents + "/" + access_token;
             fetch(eventRequest)
@@ -111,8 +111,8 @@
             .then(function (json) {
                 events.innerText = JSON.stringify(json);
             });
-        };
-
+        });
+        // END STEP 3
     </script>
   </body>
 </html>
