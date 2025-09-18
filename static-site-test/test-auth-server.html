@@ -47,9 +47,9 @@
         const resultLink = document.getElementById("authURL");
         const getAuthURL = "https://zwnqjtvn38.execute-api.us-east-1.amazonaws.com/dev/api/get-auth-url"
 
-        getAuthUrlButton.onclick = function () {
+        getAuthUrlButton.onclick = () => {
             fetch(getAuthURL)
-                .then(function (response) {
+                .then((response) => {
                     return response.json();
                 })
                 .then(function (json) {
