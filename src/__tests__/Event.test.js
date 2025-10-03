@@ -1,6 +1,7 @@
 // src/__test__s__/Event.test.js
 import React from 'react';
 import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import Event from '../components/Event';
 import mockData from '../mock-data';
 import { getEvents } from '../api';
@@ -32,7 +33,8 @@ describe('<Event /> component', () => {
     expect(button).toBeInTheDocument();
   });
 
-  test('toggles event details when button is clicked', () => {
+  test('toggles event details when button is clicked', async () => {
+    const user = userEvent.setup();
     const button = EventComponent.getByRole('button', {
       name: /show details/i,
     });
@@ -40,16 +42,18 @@ describe('<Event /> component', () => {
     //Details hidden by default
     expect(
       EventComponent.queryByText(event.description)
-    ).not.toBeIntheDocument();
+    ).not.toBeInTheDocument();
 
     //Expand details
-    button.click();
-    expect(EventComponent.getByText(event.description)).toBeIntheDocument();
+    await user.click(button);
+    expect(
+      EventComponent.getByText(/Have you wondered how you can ask Google/i)
+    ).toBeInTheDocument();
 
     //Collapse again
-    button.click();
+    await user.click(button);
     expect(
       EventComponent.queryByText(event.description)
-    ).not.toBeIntheDocument();
+    ).not.toBeInTheDocument();
   });
 });
