@@ -5,20 +5,20 @@ import NumberOfEvents from '../components/NumberOfEvents';
 
 describe('<NumberOfEvents /> component', () => {
   test('renders an input textbox', () => {
-    const { getByRole } = render(<NumberOfEvents />);
+    const { getByRole } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
     const input = getByRole('textbox');
     expect(input).toBeInTheDocument();
   });
 
   test('default value on top is 32', () => {
-    const { getByRole } = render(<NumberOfEvents />);
+    const { getByRole } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
     const input = getByRole('textbox');
     expect(input.value).toBe('32');
   });
 
   test('input value changes when user types', async () => {
     const user = userEvent.setup();
-    const { getByRole } = render(<NumberOfEvents />);
+    const { getByRole } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
     const input = getByRole('textbox');
 
     await user.type(input, '{backspace}{backspace}10');
@@ -26,7 +26,7 @@ describe('<NumberOfEvents /> component', () => {
   });
 
   test('component has the correct id wrapper', () => {
-    const { container } = render(<NumberOfEvents />);
+    const { container } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
     expect(container.querySelector('#number-of-events')).toBeInTheDocument();
   });
 });

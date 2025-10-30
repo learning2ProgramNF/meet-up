@@ -1,6 +1,6 @@
 // src/__tests__/App.test.js
 import React from 'react';
-import { render, within } from '@testing-library/react';
+import { render, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getEvents } from '../api';
 import App from './../App';
@@ -54,6 +54,28 @@ describe('<App /> integration', () => {
 
     allRenderedEventItems.forEach((event) => {
       expect(event.textContent).toContain('Berlin, Germany');
+    });
+  });
+
+  test('user can change the number of events displayed', async () => {
+    const user = userEvent.setup();
+    const AppComponent = render(<App />);
+    const AppDOM = AppComponent.container.firstChild;
+
+    //Get the NumberOFEvents input field
+    const NumberOfEventsDOM = AppDOM.querySelector('#number-of-events');
+    const NumberOfEventsInput = within(NumberOfEventsDOM).getByRole('textbox');
+
+    //Change the inpute value from default 32 to 10
+    await user.type(NumberOfEventsInput, '{backspace}{backspace}10');
+
+    //Get the EventList component
+    const EventListDOM = AppDOM.querySelector('#event-list');
+
+    //Wait for the events to be rendered with the new number
+    await waitFor(() => {
+      const EventListItems = within(EventListDOM).getAllByRole('listitem');
+      expect(EventListItems.length).toBe(10);
     });
   });
 });
