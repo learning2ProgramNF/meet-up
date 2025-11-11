@@ -1,16 +1,15 @@
-// src/compononents/EventList.jsx
+// src/components/EventList.jsx
 import React from 'react';
-import Event from "./Event";
+import Event from './Event';
 
 const EventList = ({ events }) => {
-    return ( 
-        <ul id="event-list">
-            {events?
-             events.map(event => <Event key={event.id} event={event} />) :
-             null}
-        </ul>
-    );
-}
-
+  return (
+    <ul id="event-list" className="EventList">
+      {events?.map(event => (
+        <Event key={event.id} event={event} />
+      ))}
+    </ul>
+  );
+};
 
 export default EventList;

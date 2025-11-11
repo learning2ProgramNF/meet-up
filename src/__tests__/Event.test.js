@@ -20,8 +20,10 @@ describe('<Event /> component', () => {
     expect(EventComponent.queryByText(event.summary)).toBeInTheDocument();
   });
 
-  test('renders the event start time from .created', () => {
-    expect(EventComponent.queryByText(event.created)).toBeInTheDocument();
+  test('renders the event start time from .start.dateTime', () => {
+    expect(
+      EventComponent.queryByText(event.start.dateTime)
+    ).toBeInTheDocument();
   });
 
   test('renders the event location from .location', () => {

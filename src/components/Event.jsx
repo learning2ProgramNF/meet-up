@@ -1,23 +1,29 @@
-// src/compononents/EventList.jsx
 import React, { useState } from 'react';
 
-
 const Event = ({ event }) => {
-    const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
-    const toggleDetails = () => setShowDetails(!showDetails);
+  return (
+    <li className="event">
+      <h2>{event.summary}</h2>
+      <p>{event.start.dateTime}</p>
+      <p>{event.location}</p>
 
+      {showDetails && (
+        <div className="details">
+          <h3>About this event:</h3>
+          <p>{event.description}</p>
+        </div>
+      )}
 
-    return (
-        <li>
-            <h2>{event.summary}</h2>
-            <p>{event.created}</p>
-            <p>{event.location}</p>
-            <button onClick={toggleDetails}>show details</button>
-            {showDetails && <p>{event.description}</p>}
-        </li>
-    );
-}
-
+      <button
+        className="details-btn"
+        onClick={() => setShowDetails(!showDetails)}
+      >
+        {showDetails ? 'hide details' : 'show details'}
+      </button>
+    </li>
+  );
+};
 
 export default Event;
