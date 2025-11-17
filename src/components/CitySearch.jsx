@@ -12,7 +12,7 @@ const CitySearch = ({ allLocations, setCurrentCity  = () => {} }) => {
 
     useEffect(() => {
         setSuggestions(allLocations);
-    }, [`${allLocations}`]);
+    }, [allLocations]);
 
 
     const handleInputChanged = (event) => {
