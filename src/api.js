@@ -1,20 +1,19 @@
 // src/api.js
 
 import mockData from './mock-data';
-import NProgress from 'nprogress';
-import 'nprogress/nprogress.css';
 
 /**
- *
- *
- *  The following function should be in the "api.js" file.
- *  This functions takes and events array, then uses map to creata a new array
- *  with only locations.
- *  It will also remove all duplicates by creating another new array
- *  using the spread operator and spreading a Set
- *  This will remove all duplicates from the array
+ * Utility function to extract unique locations from events
  */
-// --- Utility Functions ---
+export const extractLocations = (events) => {
+  const extractedLocations = events.map((event) => event.location);
+  const locations = [...new Set(extractedLocations)];
+  return locations;
+};
+
+/**
+ * Remove query parameters from URL
+ */
 const removeQuery = () => {
   let newurl;
   if (window.history.pushState && window.location.pathname) {
@@ -23,91 +22,124 @@ const removeQuery = () => {
       '//' +
       window.location.host +
       window.location.pathname;
+    window.history.pushState('', '', newurl);
   } else {
     newurl = window.location.protocol + '//' + window.location.host;
     window.history.pushState('', '', newurl);
   }
 };
 
-export const extractLocations = (events) => {
-  const extractedLocations = events.map((event) => event.location);
-  const locations = [...new Set(extractedLocations)];
-  return locations;
-};
-
-// --- Auth Functions ---
+/**
+ * Check if access token is valid
+ */
 const checkToken = async (accessToken) => {
-  const response = await fetch(
-    `https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/get-events?access_token=${accessToken}`
-  );
-  const result = await response.json();
-  return result;
-};
-
-const getToken = async (code) => {
-  const encodeCode = encodeURIComponent(code);
-  const response = await fetch(
-    'https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/token/' +
-      '/' +
-      encodeCode
-  );
-  const { access_token } = await response.json();
-  access_token && localStorage.setItem('access_token', access_token);
-
-  return access_token;
-};
-
-export const getAccessToken = async () => {
-  const accessToken = localStorage.getItem('access_token');
-
-  const tokenCheck = accessToken && (await checkToken(accessToken));
-
-  if (!accessToken || tokenCheck.error) {
-    await localStorage.removeItem('access_token');
-    const searchParams = new URLSearchParams(window.location.search);
-    const code = await searchParams.get('code');
-    if (!code) {
-      const response = await fetch(
-        'https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/get-auth-url'
-      );
-      const result = await response.json();
-      const { authUrl } = result;
-      return (window.location.href = authUrl);
-    }
-    return code && getAccessToken(code);
+  try {
+    const response = await fetch(
+      `https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/token/${accessToken}`
+    );
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return { error: 'Token check failed' };
   }
-  return accessToken;
 };
 
 /**
- *
- * This function will fetch the list of all events
+ * Exchange authorization code for access token
  */
-//-- Main API Functions ---
-export const getEvents = async () => {
-  NProgress.start();
+const getToken = async (code) => {
+  try {
+    const encodeCode = encodeURIComponent(code);
+    const response = await fetch(
+      `https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/token/${encodeCode}`
+    );
+    const { access_token } = await response.json();
 
+    if (access_token) {
+      localStorage.setItem('access_token', access_token);
+      return access_token;
+    }
+  } catch (error) {
+    console.error('Error getting token:', error);
+  }
+  return null;
+};
+
+/**
+ * Get access token (from storage or via OAuth flow)
+ */
+export const getAccessToken = async () => {
+  // For localhost, skip OAuth
   if (window.location.href.startsWith('http://localhost')) {
-    NProgress.done();
+    return null;
+  }
+
+  const accessToken = localStorage.getItem('access_token');
+
+  // Check if we have a valid token
+  if (accessToken) {
+    const tokenCheck = await checkToken(accessToken);
+    if (!tokenCheck.error) {
+      return accessToken;
+    }
+    // Token invalid, remove it
+    localStorage.removeItem('access_token');
+  }
+
+  // Check for authorization code in URL
+  const searchParams = new URLSearchParams(window.location.search);
+  const code = searchParams.get('code');
+
+  if (code) {
+    // Exchange code for token
+    const token = await getToken(code);
+    if (token) {
+      removeQuery();
+      return token;
+    }
+  }
+
+  // No token and no code, redirect to OAuth
+  try {
+    const response = await fetch(
+      'https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/get-auth-url'
+    );
+    const result = await response.json();
+    const { authUrl } = result;
+    window.location.href = authUrl;
+  } catch (error) {
+    console.error('Error getting auth URL:', error);
+  }
+
+  return null;
+};
+
+/**
+ * Fetch list of all events
+ */
+export const getEvents = async () => {
+  // For localhost, return mock data
+  if (window.location.href.startsWith('http://localhost')) {
     return mockData;
   }
 
-  const token = await getAccessToken();
+  // For production, use OAuth
+  try {
+    const token = await getAccessToken();
 
-  if (token) {
-    removeQuery();
-    const url =
-      'https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/get-events/' +
-      '/' +
-      token;
-    const response = await fetch(url);
-    const result = await response.json();
-    if (result) {
-      NProgress.done();
-      return result.events;
-    } else {
-      NProgress.done();
-      return null;
+    if (token) {
+      removeQuery();
+      const url = `https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/get-events/${token}`;
+      const response = await fetch(url);
+      const result = await response.json();
+
+      if (result && result.events) {
+        return result.events;
+      }
     }
+  } catch (error) {
+    console.error('Error fetching events:', error);
   }
+
+  return [];
 };
