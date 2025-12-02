@@ -2,6 +2,11 @@
 
 import mockData from './mock-data';
 
+// Token cache to prevent repeated checks
+let cachedToken = null;
+let tokenCheckTime = null;
+const TOKEN_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 /**
  * Utility function to extract unique locations from events
  */
@@ -15,16 +20,12 @@ export const extractLocations = (events) => {
  * Remove query parameters from URL
  */
 const removeQuery = () => {
-  let newurl;
   if (window.history.pushState && window.location.pathname) {
-    newurl =
+    const newurl =
       window.location.protocol +
       '//' +
       window.location.host +
       window.location.pathname;
-    window.history.pushState('', '', newurl);
-  } else {
-    newurl = window.location.protocol + '//' + window.location.host;
     window.history.pushState('', '', newurl);
   }
 };
@@ -74,16 +75,29 @@ export const getAccessToken = async () => {
     return null;
   }
 
+  // Return cached token if still valid
+  if (
+    cachedToken &&
+    tokenCheckTime &&
+    Date.now() - tokenCheckTime < TOKEN_CACHE_DURATION
+  ) {
+    return cachedToken;
+  }
+
   const accessToken = localStorage.getItem('access_token');
 
   // Check if we have a valid token
   if (accessToken) {
     const tokenCheck = await checkToken(accessToken);
     if (!tokenCheck.error) {
+      cachedToken = accessToken;
+      tokenCheckTime = Date.now();
       return accessToken;
     }
     // Token invalid, remove it
     localStorage.removeItem('access_token');
+    cachedToken = null;
+    tokenCheckTime = null;
   }
 
   // Check for authorization code in URL
@@ -95,6 +109,8 @@ export const getAccessToken = async () => {
     const token = await getToken(code);
     if (token) {
       removeQuery();
+      cachedToken = token;
+      tokenCheckTime = Date.now();
       return token;
     }
   }
@@ -128,7 +144,6 @@ export const getEvents = async () => {
     const token = await getAccessToken();
 
     if (token) {
-      removeQuery();
       const url = `https://8jjro4swqb.execute-api.us-east-1.amazonaws.com/dev/api/get-events/${token}`;
       const response = await fetch(url);
       const result = await response.json();
