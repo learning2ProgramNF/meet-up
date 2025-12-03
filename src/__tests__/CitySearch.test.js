@@ -1,4 +1,4 @@
-// src/__tests__./CitySearch.test.js
+// src/__tests__/CitySearch.test.js
 import React from 'react';
 import { render, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -8,9 +8,18 @@ import { extractLocations, getEvents } from '../api.js';
 
 describe('<CitySearch /> component', () => {
   let CitySearchComponent;
+  let mockSetCurrentCity;
+  let mockSetInfoAlert;
+
   beforeEach(() => {
+    mockSetCurrentCity = jest.fn();
+    mockSetInfoAlert = jest.fn();
     CitySearchComponent = render(
-      <CitySearch allLocations={[]} setCurrentCity={() => {}} />
+      <CitySearch
+        allLocations={[]}
+        setCurrentCity={mockSetCurrentCity}
+        setInfoAlert={mockSetInfoAlert}
+      />
     );
   });
 
@@ -38,7 +47,13 @@ describe('<CitySearch /> component', () => {
     const user = userEvent.setup();
     const allEvents = await getEvents();
     const allLocations = extractLocations(allEvents);
-    CitySearchComponent.rerender(<CitySearch allLocations={allLocations} />);
+    CitySearchComponent.rerender(
+      <CitySearch
+        allLocations={allLocations}
+        setCurrentCity={mockSetCurrentCity}
+        setInfoAlert={mockSetInfoAlert}
+      />
+    );
 
     //user types "Berlin" in city textbox
     const cityTextBox = CitySearchComponent.queryByRole('textbox');
@@ -65,7 +80,13 @@ describe('<CitySearch /> component', () => {
     const user = userEvent.setup();
     const allEvents = await getEvents();
     const allLocations = extractLocations(allEvents);
-    CitySearchComponent.rerender(<CitySearch allLocations={allLocations} />);
+    CitySearchComponent.rerender(
+      <CitySearch
+        allLocations={allLocations}
+        setCurrentCity={mockSetCurrentCity}
+        setInfoAlert={mockSetInfoAlert}
+      />
+    );
 
     const cityTextBox = CitySearchComponent.queryByRole('textbox');
     await user.type(cityTextBox, 'Berlin');
@@ -100,9 +121,15 @@ describe('<CitySearch /> integration', () => {
 
   test('renders the suggestion text in the textbox upon clicking on a suggestion', async () => {
     const user = userEvent.setup();
+    const mockSetCurrentCity = jest.fn();
+    const mockSetInfoAlert = jest.fn();
 
     const CitySearchComponent = render(
-      <CitySearch allLocations={['Berlin, Germany', 'London, UK']} />
+      <CitySearch
+        allLocations={['Berlin, Germany', 'London, UK']}
+        setCurrentCity={mockSetCurrentCity}
+        setInfoAlert={mockSetInfoAlert}
+      />
     );
 
     const cityTextBox = CitySearchComponent.queryByRole('textbox');

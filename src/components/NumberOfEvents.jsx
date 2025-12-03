@@ -2,14 +2,19 @@
 
 import React, { useState } from 'react';
 
-
-const NumberOfEvents = ({ setCurrentNOE }) => {
+const NumberOfEvents = ({ setCurrentNOE, setErrorAlert }) => {
     const [number, setNumber] = useState(32);
 
     const handleInputChanged = (e) => {
         const value = e.target.value;
         setNumber(value);
-        setCurrentNOE(value);
+        
+        if (isNaN(value) || value <= 0) {
+            setErrorAlert("Only positive numbers are allowed");
+        } else {
+            setErrorAlert("");
+            setCurrentNOE(value);
+        }
     };
 
     return (

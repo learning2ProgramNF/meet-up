@@ -62,7 +62,7 @@ describe('filter events by city', () => {
 
   beforeAll(async () => {
     browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
   }, 60000);

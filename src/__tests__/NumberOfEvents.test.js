@@ -4,21 +4,44 @@ import userEvent from '@testing-library/user-event';
 import NumberOfEvents from '../components/NumberOfEvents';
 
 describe('<NumberOfEvents /> component', () => {
+  let mockSetCurrentNOE;
+  let mockSetErrorAlert;
+
+  beforeEach(() => {
+    mockSetCurrentNOE = jest.fn();
+    mockSetErrorAlert = jest.fn();
+  });
+
   test('renders an input textbox', () => {
-    const { getByRole } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
+    const { getByRole } = render(
+      <NumberOfEvents
+        setCurrentNOE={mockSetCurrentNOE}
+        setErrorAlert={mockSetErrorAlert}
+      />
+    );
     const input = getByRole('textbox');
     expect(input).toBeInTheDocument();
   });
 
   test('default value on top is 32', () => {
-    const { getByRole } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
+    const { getByRole } = render(
+      <NumberOfEvents
+        setCurrentNOE={mockSetCurrentNOE}
+        setErrorAlert={mockSetErrorAlert}
+      />
+    );
     const input = getByRole('textbox');
     expect(input.value).toBe('32');
   });
 
   test('input value changes when user types', async () => {
     const user = userEvent.setup();
-    const { getByRole } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
+    const { getByRole } = render(
+      <NumberOfEvents
+        setCurrentNOE={mockSetCurrentNOE}
+        setErrorAlert={mockSetErrorAlert}
+      />
+    );
     const input = getByRole('textbox');
 
     await user.type(input, '{backspace}{backspace}10');
@@ -26,7 +49,12 @@ describe('<NumberOfEvents /> component', () => {
   });
 
   test('component has the correct id wrapper', () => {
-    const { container } = render(<NumberOfEvents setCurrentNOE={() => {}} />);
+    const { container } = render(
+      <NumberOfEvents
+        setCurrentNOE={mockSetCurrentNOE}
+        setErrorAlert={mockSetErrorAlert}
+      />
+    );
     expect(container.querySelector('#number-of-events')).toBeInTheDocument();
   });
 });
