@@ -40,13 +40,13 @@ export default defineConfig({
         theme_color: '#000000',
         background_color: '#ffffff',
       },
-      srcDir: 'src', // Update if your service-worker.js is elsewhere
-      filename: 'service-worker.js', // Ensure it's accessible in production
+      srcDir: 'src',
+      filename: 'service-worker.js',
       registerType: 'autoUpdate',
       workbox: {
         runtimeCaching: [
           {
-            urlPattern: /\/.*\.png$/, // Example pattern for caching png images
+            urlPattern: /\/.*\.png$/,
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'images',
