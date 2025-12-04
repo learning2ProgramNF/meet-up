@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react-swc';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: '/meet-up-beryl.vercel.app/',
   plugins: [
     react(),
     VitePWA({
