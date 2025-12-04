@@ -139,6 +139,12 @@ export const getEvents = async () => {
     return mockData;
   }
 
+  // Check if user is offline, return cached events
+  if (!navigator.onLine) {
+    const events = localStorage.getItem('lastEvents');
+    return events ? JSON.parse(events) : [];
+  }
+
   // For production, use OAuth
   try {
     const token = await getAccessToken();
@@ -149,6 +155,8 @@ export const getEvents = async () => {
       const result = await response.json();
 
       if (result && result.events) {
+        // Save events to localStorage for offline use
+        localStorage.setItem('lastEvents', JSON.stringify(result.events));
         return result.events;
       }
     }
